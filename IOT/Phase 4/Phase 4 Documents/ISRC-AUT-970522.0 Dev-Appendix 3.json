@@ -1,0 +1,376 @@
+{
+	"info": {
+		"_postman_id": "e57990c7-af87-463b-bff3-bd7788da1b4e",
+		"name": "ISRC lanserver",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Devices",
+			"item": [
+				{
+					"name": "New",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices/new",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices",
+								"new"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Push",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"SGVsbG8=\"\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices/:device_id/push",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices",
+								":device_id",
+								"push"
+							],
+							"variable": [
+								{
+									"key": "device_id",
+									"value": "0000000000000001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices/:device_id/edit",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices",
+								":device_id",
+								"edit"
+							],
+							"variable": [
+								{
+									"key": "device_id",
+									"value": "0000000000000001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices/:device_id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices",
+								":device_id"
+							],
+							"variable": [
+								{
+									"key": "device_id",
+									"value": "0000000000000001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Parham\",\n    \"DevEUI\": \"0000000000000001\",\n    \"IP\": \"192.168.73.10\"\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices/:device_id/refresh",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices",
+								":device_id",
+								"refresh"
+							],
+							"variable": [
+								{
+									"key": "device_id",
+									"value": "0000000000000001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Show",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices/:device_id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices",
+								":device_id"
+							],
+							"variable": [
+								{
+									"key": "device_id",
+									"value": "0000000000000001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Destroy",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "aabbccddee11223344"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/devices/:device_id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"devices",
+								":device_id"
+							],
+							"variable": [
+								{
+									"key": "device_id",
+									"value": "0000000000000001"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Nodes",
+			"item": [
+				{
+					"name": "Push",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwMDAwMDAwMDAwMDAwMDAxIiwiaWF0IjoxNTMwNDA1MjY4LCJpc3MiOiJsYW5zZXJ2ZXIuc2gifQ.FlM4DoQzvfphtBqUG8RlvDLJRnTIYy80EA4AXgKzbdI\",\n  \"data\": \"SGVsbG8=\"\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/node/push",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"node",
+								"push"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "33b57d4b-760f-42e8-9de7-2194b3b00b20",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "166b21c0-3715-4b3c-8cd6-60652eb990c9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "6bc0cffd-c61c-43cb-8f81-cf2bf9cb011c",
+			"key": "port",
+			"value": "4000",
+			"type": "string"
+		}
+	]
+}

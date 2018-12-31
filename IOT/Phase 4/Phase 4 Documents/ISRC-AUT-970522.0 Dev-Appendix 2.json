@@ -1,0 +1,1574 @@
+{
+	"info": {
+		"_postman_id": "49707646-7605-4704-95a0-dd653d8cf428",
+		"name": "ISRC IoT",
+		"description": "IoT backend of ISRC platform.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Runner",
+			"item": [
+				{
+					"name": "Lint",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2d63f4fb-993d-4e4a-bc1b-f419aac8aedc",
+								"type": "text/javascript",
+								"exec": [
+									"var code = `",
+									"from codec import Codec",
+									"import cbor",
+									"",
+									"class ISRC(Codec):",
+									"    def decode(self, data):",
+									"        return cbor.loads(data)",
+									"    def encode(self, data):",
+									"        return cbor.dumps(data)",
+									"`;",
+									"pm.environment.set(\"code\", JSON.stringify(code));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{code}}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{runner_port}}/api/lint",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{runner_port}}",
+							"path": [
+								"api",
+								"lint"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Decode",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6849a163-8345-4c77-844f-7e1903567571",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"cborData\", JSON.stringify(btoa(\"\\xa3clat\\nclng\\nktemperature\\x18\\x1e\")));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{cborData}}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{runner_port}}/api/decode/0000000000000001",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{runner_port}}",
+							"path": [
+								"api",
+								"decode",
+								"0000000000000001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Encode",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"lat\": 10, \"lng\": 10, \"temperature\": 30}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{runner_port}}/api/encode/0000000000000001",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{runner_port}}",
+							"path": [
+								"api",
+								"encode",
+								"0000000000000001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Codec",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "90f9397d-78ce-478c-9524-3cb1162fdcfd",
+								"type": "text/javascript",
+								"exec": [
+									"var code = `",
+									"from codec import Codec",
+									"import cbor",
+									"",
+									"",
+									"class ISRC(Codec):",
+									"    thing_location = 'loc'",
+									"",
+									"    def decode(self, data):",
+									"        print(\"Hello\")",
+									"        d = cbor.loads(data)",
+									"",
+									"        if 'lat' in d and 'lng' in d:",
+									"            d['loc'] = self.create_location(d['lat'], d['lng'])",
+									"            del d['lat']",
+									"            del d['lng']",
+									"",
+									"        return d",
+									"",
+									"    def encode(self, data):",
+									"        return cbor.dumps(data)",
+									"`;",
+									"pm.environment.set(\"code\", JSON.stringify(code));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"0000000000000001\",\n\t\"code\": {{code}}\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{runner_port}}/api/codec",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{runner_port}}",
+							"path": [
+								"api",
+								"codec"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Scenario",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "851c9cf5-da69-4a57-be5c-6e6382700b7f",
+								"type": "text/javascript",
+								"exec": [
+									"var code = `",
+									"from scenario import Scenario",
+									"from kavenegar import KavenegarAPI",
+									"",
+									"",
+									"class S1(Scenario):",
+									"    def run(self, data=None):",
+									"        q = self.find_data(['0000000000000003'])",
+									"        ",
+									"        api = KavenegarAPI('7045456F755733434A55456C667144316D6A32734B4D793350764669736F626E')",
+									"        params = {",
+									"            # optional",
+									"            'sender': '',",
+									"            # multiple mobile number, split by comma",
+									"            'receptor': '09390909540',",
+									"            'message': \"Thing %s: %s, Query: %s\" % (self.id, str(data), str(q)),",
+									"        }",
+									"        api.sms_send(params)",
+									"`;",
+									"pm.environment.set(\"code\", JSON.stringify(code));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"me\",\n\t\"code\": {{code}}\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{runner_port}}/api/scenario",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{runner_port}}",
+							"path": [
+								"api",
+								"scenario"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Container based runner engine based on Go (ISRC Platform)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a69f89e8-30b3-499d-a3ff-fe3c48f1185f",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c1a34ad-5230-4b89-8290-4e37dce81708",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "GM",
+			"item": [
+				{
+					"name": "Decrypt",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phy_payload\": \"QD8eASYARB4CRIg1N+sjkiIjF+X8GHyUkOM=\",\n  \"appskey\": \"20371D2CA5E177747E4380DB514C5185\",\n  \"netskey\": \"4BDC4F792322FD316D9137D2EB767153\"\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{gm_port}}/api/decrypt",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{gm_port}}",
+							"path": [
+								"api",
+								"decrypt"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PM",
+			"item": [
+				{
+					"name": "Things",
+					"item": [
+						{
+							"name": "Show",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/things/:thing_id",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"things",
+										":thing_id"
+									],
+									"variable": [
+										{
+											"key": "thing_id",
+											"value": "0000000000000001"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"0000000000000073\",\n  \"project\": \"hello\"\n}"
+								},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/things",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"things"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Activate",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/things/0000000000000001/activate",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"things",
+										"0000000000000001",
+										"activate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Destroy",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/things/0000000000000001",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"things",
+										"0000000000000001"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/things",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"things"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Deactivate",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/things/0000000000000001/deactivate",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"things",
+										"0000000000000001",
+										"deactivate"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Runners",
+					"item": [
+						{
+							"name": "Codec",
+							"item": [
+								{
+									"name": "Decode",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "6849a163-8345-4c77-844f-7e1903567571",
+												"type": "text/javascript",
+												"exec": [
+													"pm.environment.set(\"cborData\", JSON.stringify(btoa(\"\\xa3clat\\nclng\\nktemperature\\x18\\x1e\")));"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{{cborData}}"
+										},
+										"url": {
+											"raw": "http://{{host}}:{{pm_port}}/api/runners/:project_id/decode/:thing_id",
+											"protocol": "http",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{pm_port}}",
+											"path": [
+												"api",
+												"runners",
+												":project_id",
+												"decode",
+												":thing_id"
+											],
+											"variable": [
+												{
+													"key": "project_id",
+													"value": "hello"
+												},
+												{
+													"key": "thing_id",
+													"value": "0000000000000073"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Encode",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"lat\": 10, \"lng\": 10, \"temperature\": 30}"
+										},
+										"url": {
+											"raw": "http://{{host}}:{{pm_port}}/api/runners/:project_id/encode/:thing_id",
+											"protocol": "http",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{pm_port}}",
+											"path": [
+												"api",
+												"runners",
+												":project_id",
+												"encode",
+												":thing_id"
+											],
+											"variable": [
+												{
+													"key": "project_id",
+													"value": "hello"
+												},
+												{
+													"key": "thing_id",
+													"value": "0000000000000001"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Codec",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "90f9397d-78ce-478c-9524-3cb1162fdcfd",
+												"type": "text/javascript",
+												"exec": [
+													"var code = `",
+													"from codec import Codec",
+													"import cbor",
+													"",
+													"",
+													"class ISRC(Codec):",
+													"    thing_location = 'loc'",
+													"",
+													"    def decode(self, data):",
+													"        print(\"Hello\")",
+													"        d = cbor.loads(data)",
+													"",
+													"        if 'lat' in d and 'lng' in d:",
+													"            d['loc'] = self.create_location(d['lat'], d['lng'])",
+													"            del d['lat']",
+													"            del d['lng']",
+													"",
+													"        return d",
+													"",
+													"    def encode(self, data):",
+													"        return cbor.dumps(data)",
+													"`;",
+													"pm.environment.set(\"code\", JSON.stringify(code));"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\": \"0000000000000073\",\n  \"code\": {{code}}\n}"
+										},
+										"url": {
+											"raw": "http://{{host}}:{{pm_port}}/api/runners/:project_id/codec",
+											"protocol": "http",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{pm_port}}",
+											"path": [
+												"api",
+												"runners",
+												":project_id",
+												"codec"
+											],
+											"variable": [
+												{
+													"key": "project_id",
+													"value": "hello"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Scenario",
+							"item": [
+								{
+									"name": "Activate",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "http://{{host}}:{{pm_port}}/api/runners/:project_id/scenario/main/activate",
+											"protocol": "http",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{pm_port}}",
+											"path": [
+												"api",
+												"runners",
+												":project_id",
+												"scenario",
+												"main",
+												"activate"
+											],
+											"variable": [
+												{
+													"key": "project_id",
+													"value": "hello"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Upsert",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "851c9cf5-da69-4a57-be5c-6e6382700b7f",
+												"type": "text/javascript",
+												"exec": [
+													"var code = `",
+													"from scenario import Scenario",
+													"from kavenegar import KavenegarAPI",
+													"",
+													"",
+													"class S1(Scenario):",
+													"    def run(self, data=None):",
+													"        q = self.find_data(['0000000000000003'])",
+													"        ",
+													"        api = KavenegarAPI('7045456F755733434A55456C667144316D6A32734B4D793350764669736F626E')",
+													"        params = {",
+													"            # optional",
+													"            'sender': '',",
+													"            # multiple mobile number, split by comma",
+													"            'receptor': '09390909540',",
+													"            'message': \"Thing %s: %s, Query: %s\" % (self.id, str(data), str(q)),",
+													"        }",
+													"        api.sms_send(params)",
+													"`;",
+													"pm.environment.set(\"code\", JSON.stringify(code));"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\": \"me\",\n  \"code\": {{code}}\n}"
+										},
+										"url": {
+											"raw": "http://{{host}}:{{pm_port}}/api/runners/:project_id/scenario",
+											"protocol": "http",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{pm_port}}",
+											"path": [
+												"api",
+												"runners",
+												":project_id",
+												"scenario"
+											],
+											"variable": [
+												{
+													"key": "project_id",
+													"value": "hello"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deactivate",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "http://{{host}}:{{pm_port}}/api/runners/:project_id/scenario/main/deactivate",
+											"protocol": "http",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{pm_port}}",
+											"path": [
+												"api",
+												"runners",
+												":project_id",
+												"scenario",
+												"main",
+												"deactivate"
+											],
+											"variable": [
+												{
+													"key": "project_id",
+													"value": "hello"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Lint",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "2d63f4fb-993d-4e4a-bc1b-f419aac8aedc",
+										"type": "text/javascript",
+										"exec": [
+											"var code = `",
+											"from codec import Codec",
+											"import cbor",
+											"",
+											"class ISRC(Codec):",
+											"    def decode(self, data):",
+											"        return cbor.loads(data)",
+											"    def encode(self, data):",
+											"        return cbor.dumps(data)",
+											"`;",
+											"pm.environment.set(\"code\", JSON.stringify(code));"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{code}}"
+								},
+								"url": {
+									"raw": "http://{{host}}:{{pm_port}}/api/runners/:project_id/lint",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"runners",
+										":project_id",
+										"lint"
+									],
+									"variable": [
+										{
+											"key": "project_id",
+											"value": "hello"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "About",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/runners/:project_id/about",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"runners",
+										":project_id",
+										"about"
+									],
+									"variable": [
+										{
+											"key": "project_id",
+											"value": "hello"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Projects",
+					"item": [
+						{
+							"name": "List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/projects",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"projects"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "5fe54341-0355-44e2-96de-47e2e495d76f",
+										"type": "text/javascript",
+										"exec": [
+											"pm.response.to.be.ok;",
+											"",
+											"var port = pm.response.json().runner.port;",
+											"console.log(port);",
+											"// pm.environment.set(\"runner_port\", port);"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"hello\",\n  \"envs\": {\n    \"USER\": \"parham.alvani@gmail.com\"\n  }\n}"
+								},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/projects",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"projects"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Error LoRa",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/projects/:project_id/errors/lora?limit=10",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"projects",
+										":project_id",
+										"errors",
+										"lora"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									],
+									"variable": [
+										{
+											"key": "project_id",
+											"value": "hello"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Activate",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/projects/:project_id/activate",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"projects",
+										":project_id",
+										"activate"
+									],
+									"variable": [
+										{
+											"key": "project_id",
+											"value": "hello"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Show",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/projects/:project_id",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"projects",
+										":project_id"
+									],
+									"variable": [
+										{
+											"key": "project_id",
+											"value": "hello"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Error Project",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/projects/:project_id/errors/project?limit=1",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"projects",
+										":project_id",
+										"errors",
+										"project"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "1"
+										}
+									],
+									"variable": [
+										{
+											"key": "project_id",
+											"value": "hello"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Destroy",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/projects/:project_id",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"projects",
+										":project_id"
+									],
+									"variable": [
+										{
+											"key": "project_id",
+											"value": "hello"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Deactivate",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{host}}:{{pm_port}}/api/projects/:project_id/deactivate",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{pm_port}}",
+									"path": [
+										"api",
+										"projects",
+										":project_id",
+										"deactivate"
+									],
+									"variable": [
+										{
+											"key": "project_id",
+											"value": "hello"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "About",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d3c6c9d-7547-423a-81e1-6766d7300ecb",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host}}:{{pm_port}}/api/about",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{pm_port}}",
+							"path": [
+								"api",
+								"about"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Project Manager of ISRC Platform",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "96a4d810-7ff0-4eb8-b7ea-e3ed58242db3",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "cb8a3ae9-6e61-4215-8426-6ea13fa4a3ee",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "DM",
+			"item": [
+				{
+					"name": "Things",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{dm_port}}/api/things",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{dm_port}}",
+							"path": [
+								"api",
+								"things"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Gateway Enable",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{dm_port}}/api/gateway/b827ebffff66232d/enable",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{dm_port}}",
+							"path": [
+								"api",
+								"gateway",
+								"b827ebffff66232d",
+								"enable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "About",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{dm_port}}/api/about",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{dm_port}}",
+							"path": [
+								"api",
+								"about"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Gateway Log",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{dm_port}}/api/gateway/b827ebffff66232d?since={{$timestamp}}&limit=1",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{dm_port}}",
+							"path": [
+								"api",
+								"gateway",
+								"b827ebffff66232d"
+							],
+							"query": [
+								{
+									"key": "since",
+									"value": "{{$timestamp}}"
+								},
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Gateway Log 1",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://{{host}}:{{dm_port}}/api/gateway/b827ebffff66232d?since={{$timestamp}}&limit=10",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{dm_port}}",
+									"path": [
+										"api",
+										"gateway",
+										"b827ebffff66232d"
+									],
+									"query": [
+										{
+											"key": "since",
+											"value": "{{$timestamp}}"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "766",
+									"name": "Content-Length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 14 May 2018 12:46:36 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": true,
+									"domain": "192.168.73.5",
+									"path": "/",
+									"secure": false,
+									"value": "",
+									"key": "REVEL_FLASH"
+								}
+							],
+							"body": "[{\"_id\":\"5af9852c1c9404c6c928141e\",\"downlinkframe\":null,\"mac\":\"b827ebffff66232d\",\"timestamp\":\"2018-05-14T17:16:36.162+04:30\",\"uplinkframe\":{\"phypayloadjson\":\"{\\\"mhdr\\\":{\\\"mType\\\":\\\"UnconfirmedDataUp\\\",\\\"major\\\":\\\"LoRaWANR1\\\"},\\\"macPayload\\\":{\\\"fhdr\\\":{\\\"devAddr\\\":\\\"00000037\\\",\\\"fCtrl\\\":{\\\"adr\\\":false,\\\"adrAckReq\\\":false,\\\"ack\\\":false,\\\"fPending\\\":false,\\\"classB\\\":false},\\\"fCnt\\\":47343,\\\"fOpts\\\":null},\\\"fPort\\\":1,\\\"frmPayload\\\":[{\\\"bytes\\\":\\\"YfVCHc3IOSeNxroCUQ==\\\"}]},\\\"mic\\\":\\\"e574f0e1\\\"}\",\"rxinfo\":[{\"antenna\":0,\"board\":0,\"lorasnr\":5.5,\"mac\":\"b827ebffff66232d\",\"rssi\":-83,\"time\":\"\",\"timesincegpsepoch\":\"\",\"timestamp\":2547408420}],\"txinfo\":{\"coderate\":\"4/5\",\"datarate\":{\"bandwidth\":125,\"bitrate\":0,\"modulation\":\"LORA\",\"spreadfactor\":11},\"frequency\":867500000}}}]"
+						}
+					]
+				},
+				{
+					"name": "ThingLastParsed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{dm_port}}/api/things/0000000000000001/p",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{dm_port}}",
+							"path": [
+								"api",
+								"things",
+								"0000000000000001",
+								"p"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ThingsData",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"thing_ids\": [\"0000000000000006\", \"0000000000000073\"],\n  \"since\": 0,\n  \"until\": {{$timestamp}},\n  \"limit\": 1\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{dm_port}}/api/things",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{dm_port}}",
+							"path": [
+								"api",
+								"things"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ThingsDataWindow",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"thing_ids\": [\"0000000000000073\", \"0000000000000001\", \"0000000000000006\"],\n  \"since\": 0,\n  \"until\": {{$timestamp}},\n  \"cn\": {{$timestamp}}\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{dm_port}}/api/things/w",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{dm_port}}",
+							"path": [
+								"api",
+								"things",
+								"w"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ThingData",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{dm_port}}/api/things/0000000000000003?until={{$timestamp}}&since=0",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{dm_port}}",
+							"path": [
+								"api",
+								"things",
+								"0000000000000003"
+							],
+							"query": [
+								{
+									"key": "until",
+									"value": "{{$timestamp}}"
+								},
+								{
+									"key": "since",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Data Management of ISRC Platform"
+		},
+		{
+			"name": "Downlink",
+			"item": [
+				{
+					"name": "Send",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\"lat\": 10, \"lng\": 10, \"temperature\": 30},\n  \"thing_id\": \"41000000000000bb\",\n  \"application_id\": \"18\",\n  \"fport\": 2\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{downlink_port}}/api/send",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{downlink_port}}",
+							"path": [
+								"api",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Raw",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"SGVsbG8=\",\n  \"thing_id\": \"0000000000000001\",\n  \"application_id\": \"147\",\n  \"ss\": 1,\n  \"rn\": 1,\n  \"sleep\": 1\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{downlink_port}}/api/raw",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{downlink_port}}",
+							"path": [
+								"api",
+								"raw"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "ISRC Platform downlink service"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d07ab567-ab95-4f84-9560-c11bec542d94",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "23252071-906a-4dec-90c7-c6f3aa43846f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "cad84a6d-ea61-4ba7-a136-df32930e8737",
+			"key": "dm_port",
+			"value": "1372",
+			"type": "string"
+		},
+		{
+			"id": "0a5961d5-a2f3-43fa-9479-fa895f951dca",
+			"key": "pm_port",
+			"value": "8080",
+			"type": "string"
+		},
+		{
+			"id": "465f6cec-4458-4568-9e23-954e7dd99f4c",
+			"key": "runner_port",
+			"value": "8080",
+			"type": "string"
+		},
+		{
+			"id": "20d2dce9-492e-4b33-ae93-7eca48246dab",
+			"key": "downlink_port",
+			"value": "1373",
+			"type": "string"
+		},
+		{
+			"id": "cc57a5f3-4bee-4043-99cf-4d50a9d9d02d",
+			"key": "gm_port",
+			"value": "1374",
+			"type": "string"
+		}
+	]
+}
